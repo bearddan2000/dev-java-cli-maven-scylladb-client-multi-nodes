@@ -1,0 +1,27 @@
+version: '3'
+services:
+  java-srv:
+    build: java-srv
+    command: sh -c "/wait && mvn clean compile exec:java"
+    environment:
+      - WAIT_HOSTS=node1:19042,node2:19042,node3:19042
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+
+  node1:
+    build: db
+    command: sh -c "/wait && scylla --developer-mode 1 --seeds=node2,node3"
+    environment:
+      - WAIT_HOSTS=node2:19042,node3:19042
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+
+  node2:
+    build: db
+    command: --developer-mode 1
+
+  node3:
+    build: db
+    command: --developer-mode 1
